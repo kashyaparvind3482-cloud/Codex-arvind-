@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Codex Typing</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #0d1017;
+  color: #ffffff;
+  font-family: Arial, sans-serif;
+  min-height: 100vh;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: #151923;
+  border-bottom: 1px solid #292e3a;
+}
+
+.logo {
+  font-size: 23px;
+  font-weight: bold;
+  color: #a78bfa;
+}
+
+.coins {
+  background: #24202f;
+  color: #facc15;
+  padding: 12px 15px;
+  border-radius: 12px;
+  font-weight: bold;
+}
+
+main {
+  width: 100%;
+  max-width: 850px;
+  margin: 35px auto;
+  padding: 18px;
+}
+
+.hero {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.hero h1 {
+  font-size: clamp(30px, 6vw, 44px);
+  margin-bottom: 12px;
+}
+
+.hero h1 span {
+  color: #a78bfa;
+}
+
+.hero p {
+  color: #9ca3af;
+  line-height: 1.6;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.stat {
+  background: #171b25;
+  border: 1px solid #2b3040;
+  padding: 17px 8px;
+  border-radius: 14px;
+  text-align: center;
+}
+
+.stat h2 {
+  font-size: 25px;
+  margin-bottom: 6px;
+}
+
+.stat p {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.card {
+  background: #171b25;
+  padding: 23px;
+  border: 1px solid #303647;
+  border-radius: 20px;
+}
+
+.card h3 {
+  margin-bottom: 15px;
+}
+
+.typing-area {
+  position: relative;
+  background: #0e121a;
+  padding: 20px;
+  border: 1px solid #363d50;
+  border-radius: 14px;
+  cursor: text;
+  min-height: 170px;
+}
+
+#display {
+  font-family: monospace;
+  font-size: clamp(20px, 4.5vw, 28px);
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+
+.letter {
+  color: #737b8c;
+}
+
+.letter.correct {
+  color: #ffffff;
+}
+
+.letter.wrong {
+  color: #fb7185;
+  background: #48202a;
+}
+
+.letter.current {
+  border-bottom: 3px solid #a78bfa;
+}
+
+#typingInput {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.01;
+  resize: none;
+  border: 0;
+  outline: 0;
+  font-size: 16px;
+  cursor: text;
+}
+
+.progress-bg {
+  height: 7px;
+  background: #303647;
+  border-radius: 20px;
+  margin-top: 18px;
+  overflow: hidden;
+}
+
+#progress {
+  height: 100%;
+  width: 0%;
+  background: #a78bfa;
+  transition: width 0.15s;
+}
+
+.help {
+  color: #9ca3af;
+  font-size: 12px;
+  margin-top: 12px;
+  line-height: 1.6;
+}
+
+.buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+button {
+  border: 0;
+  border-radius: 12px;
+  padding: 14px 20px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#startBtn {
+  background: #a78bfa;
+  color: #11111b;
+  flex: 1;
+}
+
+#resetBtn {
+  background: #303647;
+  color: white;
+}
+
+#message {
+  margin-top: 18px;
+  line-height: 1.7;
+  color: #86efac;
+  font-weight: bold;
+}
+
+footer {
+  text-align: center;
+  padding: 25px 10px;
+  color: #737b8c;
+  font-size: 12px;
+}
+
+@media (max-width: 480px) {
+  main {
+    margin-top: 22px;
+    padding: 13px;
+  }
+
+  .card {
+    padding: 16px;
+  }
+
+  .typing-area {
+    padding: 15px;
+  }
+
+  .stat {
+    padding: 14px 4px;
+  }
+
+  .stat h2 {
+    font-size: 21px;
+  }
+
+  .buttons button {
+    padding: 14px 10px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">⌨ Codex Typing</div>
+  <div class="coins">🪙 <span id="coins">0</span> Coins</div>
+</header>
+
+<main>
+
+  <section class="hero">
+    <h1>Improve Your <span>Typing</span></h1>
+    <p>Type the sentence correctly and collect coins!</p>
+  </section>
+
+  <section class="stats">
+    <div class="stat">
+      <h2 id="wpm">0</h2>
+      <p>WPM SPEED</p>
+    </div>
+
+    <div class="stat">
+      <h2 id="accuracy">100%</h2>
+      <p>ACCURACY</p>
+    </div>
+
+    <div class="stat">
+      <h2 id="completed">0</h2>
+      <p>COMPLETED</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <h3>⌨ Typing Practice</h3>
+
+    <div class="typing-area" id="typingArea">
+      <div id="display"></div>
+      <textarea
+        id="typingInput"
+        aria-label="Type the displayed sentence"
+        autocomplete="off"
+        autocapitalize="off"
+        spellcheck="false"
+        enterkeyhint="done"
+      ></textarea>
+    </div>
+
+    <div class="progress-bg">
+      <div id="progress"></div>
+    </div>
+
+    <p class="help">
+      Grey letters are waiting to be typed. Correct letters turn white.
+      Tap the sentence to open your mobile keyboard.
+    </p>
+
+    <div class="buttons">
+      <button id="startBtn">Start Typing</button>
+      <button id="resetBtn">↻ Restart</button>
+    </div>
+
+    <div id="message" aria-live="polite"></div>
+  </section>
+
+</main>
+
+<footer>
+  © 2026 Codex Typing · Practice every day
+</footer>
+
+<script>
+const sentence =
+  "The quick brown fox jump over the lazy dog.";
+
+const display = document.getElementById("display");
+const input = document.getElementById("typingInput");
+const progress = document.getElementById("progress");
+const message = document.getElementById("message");
+
+let coins = Number(localStorage.getItem("codexCoins")) || 0;
+let completed = Number(localStorage.getItem("codexCompleted")) || 0;
+let startedAt = null;
+let finished = false;
+
+document.getElementById("coins").textContent = coins;
+document.getElementById("completed").textContent = completed;
+
+function renderText() {
+  const typed = input.value;
+  display.innerHTML = "";
+
+  for (let i = 0; i < sentence.length; i++) {
+    const span = document.createElement("span");
+    span.className = "letter";
+    span.textContent = sentence[i];
+
+    if (i < typed.length) {
+      if (typed[i] === sentence[i]) {
+        span.classList.add("correct");
+      } else {
+        span.classList.add("wrong");
+      }
+    } else if (i === typed.length && !finished) {
+      span.classList.add("current");
+    }
+
+    display.appendChild(span);
+  }
+
+  const correct = [...typed].filter(
+    (char, i) => char === sentence[i]
+  ).length;
+
+  const accuracy = typed.length
+    ? Math.round((correct / typed.length) * 100)
+    : 100;
+
+  document.getElementById("accuracy").textContent =
+    accuracy + "%";
+
+  progress.style.width =
+    Math.min((typed.length / sentence.length) * 100, 100) + "%";
+
+  if (startedAt && !finished) {
+    const minutes = (Date.now() - startedAt) / 60000;
+    const wpm = minutes > 0
+      ? Math.round((correct / 5) / minutes)
+      : 0;
+
+    document.getElementById("wpm").textContent = wpm;
+  }
+
+  if (typed === sentence && !finished) {
+    finishTyping();
+  }
+}
+
+function finishTyping() {
+  finished = true;
+
+  // Coins are awarded once per completed sentence.
+  coins += 10;
+  completed++;
+
+  localStorage.setItem("codexCoins", coins);
+  localStorage.setItem("codexCompleted", completed);
+
+  document.getElementById("coins").textContent = coins;
+  document.getElementById("completed").textContent = completed;
+
+  message.textContent =
+    "🎉 Excellent! +10 coins earned. Start again to earn more!";
+
+  input.blur();
+}
+
+function startTyping() {
+  if (finished) resetTyping();
+
+  if (!startedAt) startedAt = Date.now();
+
+  input.focus();
+  message.textContent = "";
+}
+
+function resetTyping() {
+  input.value = "";
+  startedAt = null;
+  finished = false;
+
+  document.getElementById("wpm").textContent = "0";
+  document.getElementById("accuracy").textContent = "100%";
+
+  message.textContent = "";
+  renderText();
+}
+
+input.addEventListener("input", () => {
+  if (finished) return;
+
+  if (input.value.length > 0 && !startedAt) {
+    startedAt = Date.now();
+  }
+
+  // Keep input within the displayed sentence.
+  if (input.value.length > sentence.length) {
+    input.value = input.value.slice(0, sentence.length);
+  }
+
+  renderText();
+});
+
+document.getElementById("typingArea").addEventListener(
+  "click", () => {
+    if (!finished) input.focus();
+  }
+);
+
+document.getElementById("startBtn").addEventListener(
+  "click", startTyping
+);
+
+document.getElementById("resetBtn").addEventListener(
+  "click", resetTyping
+);
+
+renderText();
+</script>
+
+</body>
+      </html>
